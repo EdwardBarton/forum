@@ -5,3 +5,11 @@
 li {
   margin: 10px 0;
 }
+
+.hide-el {
+  display: none;
+}
+
+.show-el {
+  display: inline;
+}
