@@ -1,24 +1,19 @@
 // *************** FUNCTIONS ****************** //
 
 const createPostButton = (faIcon, bsBtnClass, btnClass) => {
-  const button = document.createElement(`button`);
-  const icon = document.createElement(`i`);
-  icon.setAttribute(`class`, `fas fa-${faIcon}`);
-  button.appendChild(icon);
-  button.setAttribute(`class`, `btn btn-sm btn-${bsBtnClass} ${btnClass}`);
-  return button; // returns button html node
+  return $(`<button class="btn btn-sm btn-${bsBtnClass} ${btnClass}"><i class="fas fa-${faIcon}"></i></button>`);
 };
 
 // Creates a post object, pushes to the posts array, and renders posts
 let postId = 0;
-const createPost = (userName, postContent) => {
+const createPost = (name, postContent) => {
   const post = {
-    owner: userName,
+    author: name,
     message: postContent,
     votes: 0,
     id: postId,
-    editPost(newOwner, newMessage) {
-      this.owner = newOwner;
+    editPost(newAuthor, newMessage) {
+      this.author = newAuthor;
       this.message = newMessage;
     }
   };
@@ -26,23 +21,16 @@ const createPost = (userName, postContent) => {
 
   // Increment id for next post obj that gets created (post.id)
   postId++;
-  renderPosts();
+  sortAndRenderPosts();
 };
 
 // Render HTML for posts
-const renderPosts = () => {
-  // Clear existing posts from posts (ul) html
-  while (postsList.hasChildNodes()) {
-    postsList.removeChild(postsList.firstChild);
-  }
+const sortAndRenderPosts = () => {
+  posts.sort((a, b) => b.votes - a.votes);
 
   // Create post buttons
   const upvoteButton = createPostButton(`arrow-up`, `success`, `upvotePost`);
-  const downvoteButton = createPostButton(
-    `arrow-down`,
-    `warning`,
-    `downvotePost`
-  );
+  const downvoteButton = createPostButton(`arrow-down`, `warning`, `downvotePost`);
   const editButton = createPostButton(`edit`, `primary`, `editPost`);
   const deleteButton = createPostButton(`trash-alt`, `danger`, `deletePost`);
 
@@ -50,91 +38,94 @@ const renderPosts = () => {
   let postHTML = '';
   posts.map(post => {
     postHTML += `<li data-id="${post.id}">`;
-    postHTML += `<span class='name'>${post.owner}</span> - `;
-    postHTML += `<span class='message'>${post.message} </span>`;
-    postHTML += `<i class="fas fa-thumbs-up"></i>`;
+    postHTML += `<span class='post'>`;
+    postHTML += `<span class='author'>${post.author}</span> - `;
+    postHTML += `<span class='message'>${post.message} </span></span>`;
+    postHTML += `<form class='edit-post hide-el'>`;
+    postHTML += `<input class='edit-author' placeholder='New Author' value='${post.author}'>`;
+    postHTML += `<input class='edit-message' placeholder='New Message' value='${post.message}'>`;
+    postHTML += `<button type="submit">Edit</button>`;
+    postHTML += `</form>`;
+    postHTML += ` <i class="fas fa-thumbs-up"></i>`;
     postHTML += `<span class='votes'> ${post.votes} </span>`;
-    postHTML += upvoteButton.outerHTML;
-    postHTML += downvoteButton.outerHTML;
-    postHTML += editButton.outerHTML;
-    postHTML += deleteButton.outerHTML;
+    postHTML += upvoteButton[0].outerHTML;
+    postHTML += downvoteButton[0].outerHTML;
+    postHTML += editButton[0].outerHTML;
+    postHTML += deleteButton[0].outerHTML;
     postHTML += `</li>`;
   });
 
   // Add post to posts list ul
-  postsList.innerHTML = postHTML;
+  postsList.html(postHTML);
 };
 
 // ************ VARIABLES ************** //
 
 const posts = [];
-const postsList = document.querySelector(`ul`);
-const nameInput = document.querySelector(`input`);
-const messageTextArea = document.querySelector(`textarea`);
-const submitButton = document.querySelector(`[type='submit']`);
+const postsList = $('ul');
+const nameInput = $('#name');
+const messageTextArea = $('#message');
+const submitButton = $(`button[type='submit']`);
 
 // ************** EVENT HANDLERS ************** //
 
 // On form submission, a post should be created based off of the user's inputs
-submitButton.addEventListener(`click`, e => {
+submitButton.on(`click`, function(e) {
   // Prevent form from actually submitting anywhere
   e.preventDefault();
 
   // Get user's inputs and create the post obj
-  let name = nameInput.value;
-  let message = messageTextArea.value;
+  let name = nameInput.val();
+  let message = messageTextArea.val();
   createPost(name, message);
 
   // Clear form and focus on input
-  nameInput.value = ``;
-  messageTextArea.value = ``;
+  nameInput.val('');
+  messageTextArea.val('');
   nameInput.focus();
 });
 
 // Handle post's button clicks after they've been rendered onto the page
-postsList.addEventListener(`click`, e => {
+postsList.on(`click`, 'button', function() {
   // Determine which button was clicked and the data-id of the html post
-  const clickedButton = e.target.closest('button');
-  const postLi = e.target.closest('li');
-  const postLiDataId = parseInt(postLi.getAttribute('data-id'));
+  const clickedButton = $(this);
+  const postLiDataId = parseInt(clickedButton.closest('li').attr('data-id'));
 
   // Map JavaScript post obj --> html post li
-  posts.map(post => {
+  posts.forEach(post => {
     if (post.id === postLiDataId) {
       // Upvote post
-      if (clickedButton.classList.contains('upvotePost')) {
+      if (clickedButton.hasClass('upvotePost')) {
         post.votes++;
+        sortAndRenderPosts();
       }
       // Downvote post
-      else if (clickedButton.classList.contains('downvotePost')) {
+      else if (clickedButton.hasClass('downvotePost')) {
         post.votes--;
+        sortAndRenderPosts();
       }
-      // Edit post - Not ideal, hacked
-      else if (clickedButton.classList.contains('editPost')) {
-        // postLi.style.display = 'none';   // Hide post while editing
-        // nameInput.value = post.owner;    // Place post values back into inputs for editing
-        // messageTextArea.value = post.message;
-        // submitButton.textContent = 'Edit';   // Change 'Post' button to 'Edit' button
+      // Edit post
+      else if (clickedButton.hasClass('editPost')) {
+        // Hide post span from page while editing
+        clickedButton.parent().find('.post').addClass('hide-el');
 
-        /* TODO: Clicking 'new' Edit button updates post obj with new values and re-displays post on page, w/o creating a new post object.
-        The current button listener creates new post objects */
-        // const newOwner = nameInput.value;
-        // const newMessage = messageTextArea.value;
-        const newOwner = prompt('Who is the updated author of this post?');
-        const newMessage = prompt(
-          `What is the updated message you'd like to say?`
-        );
-        post.editPost(newOwner, newMessage);
-        // postLi.style.display = 'list-item';
+        // Show edit-post form with post obj values
+        clickedButton.parent().find('.edit-post').removeClass('hide-el').addClass('show-el');
+        clickedButton.parent().find('.edit-author').val(post.author).focus();
+        clickedButton.parent().find('.edit-message').val(post.message);
+        
+        // Edit post obj and re-render posts once changes are complete
+        $('.edit-post').on(`submit`, function(e) {
+          e.preventDefault();
+          post.editPost($(this).find('.edit-author').val(), $(this).find('.edit-message').val());
+          sortAndRenderPosts();
+        });
       }
       // Delete post
-      else if (clickedButton.classList.contains('deletePost')) {
+      else if (clickedButton.hasClass('deletePost')) {
         posts.splice(posts.indexOf(post), 1);
+        sortAndRenderPosts();
       }
     }
   });
-
-  // Sort and re-render
-  posts.sort((a, b) => b.votes - a.votes);
-  renderPosts();
 });
