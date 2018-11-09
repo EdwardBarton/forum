@@ -1,47 +1,82 @@
 <html>
+
 <head>
-  <title>Forum</title>
+  <title>Project Reddit</title>
   <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+    crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="row">
-    <div class="col-md-6 col-md-offset-3">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
 
-      <div class="page-header">
-        <h1>Forum</h1>
-      </div>
-
-      <div class="posts">
-        <ul></ul>
-      </div>
-
-      <form style="margin-top:30px;">
-        <h3>Add a new post</h3>
-        
-        <div class="form-group">
-          <input id="name" type="text"
-            class="form-control"
-            placeholder="Name">
+        <div class="page-header">
+          <h1>Project Reddit</h1>
         </div>
-        
-        <div class="form-group">
-          <textarea id="message" type="text"
-          class="form-control"
-          placeholder="Message"></textarea>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Post</button>
-      </form>
 
+        <div class="posts">
+          <ul class="posts-list"></ul>
+        </div>
+
+        <form class="add-post add-comment" style="margin-top:30px;">
+          <h3>Add a new post</h3>
+
+          <div class="form-group">
+            <input id="name" type="text" class="form-control" placeholder="Name" autofocus>
+          </div>
+
+          <div class="form-group">
+            <textarea id="message" type="text" class="form-control comment" placeholder="Message"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary add-post-btn">Post</button>
+        </form>
+
+      </div>
     </div>
   </div>
-  
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.12/handlebars.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
   <script src="main.js"></script>
+
+  <!-- Handlebars post template -->
+  <script id="post-template" type="text/x-handlebars-template">
+    <li class="post-item panel panel-default" data-id="{{id}}">
+      <form class="edit-post-form hide-el">
+        <input class="edit-author" placeholder="Author" value="{{author}}">
+        <input class="edit-message" placeholder="Message" value="{{message}}">
+        <button type="submit" class="edit-post-btn">Edit</button>
+      </form>
+      <span class="post"><strong>{{author}}</strong> - {{message}} </span> 
+      <i class="fas fa-thumbs-up"></i>
+      {{votes}}
+      <button class="btn btn-sm btn-success upvote-post"><i class="fas fa-arrow-up"></i></button>
+      <button class="btn btn-sm btn-warning downvote-post"><i class="fas fa-arrow-down"></i></button>
+      <button class="btn btn-sm btn-primary edit-post"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-sm btn-danger delete-post"><i class="fas fa-trash-alt"></i></button>
+      <button class="btn btn-sm btn-default add-post-comment"><i class="fas fa-comment"></i></button>
+      <span class="comment-count">{{comments.length}}</span>
+      <div class="post-comments">
+        <ul class="comments-list"></ul>
+      </div>
+    </li>
+  </script>
+
+  <!-- Handlebars comment template -->
+  <script id="comment-template" type="text/x-handlebars-template">
+    <li class="comment-item">
+      <span class="comment"><strong>{{author}}</strong> - {{comment}}</span>
+      <a href="#" class="delete-comment">
+        <i class="fas fa-times" style="color: red;"></i>
+      </a>
+    </li>
+  </script>
 </body>
+
 </html>
-
-
-
