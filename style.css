@@ -1,9 +1,28 @@
-.upvotePost, .downvotePost, .editPost, .deletePost {
+body {
+  background-color: #b5d0f2;
+  color: white;
+}
+
+.upvotePost, .downvotePost, .editPost, .deletePost, .addComment {
   margin: 0 2px 0;
 }
 
-li {
+.posts-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-item {
   margin: 10px 0;
+  padding: 15px;
+  color: black;
+}
+
+.comments-list {
+  list-style-type: none;
+  padding: 0;
+  margin-left: 40px;
 }
 
 .hide-el {
